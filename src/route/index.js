@@ -37,9 +37,7 @@
 // export const item = [itemRoutes]
 // export const quizz = [quizzRoutes]
 // export const check = [checkRoutes]
-//
-//
-// export default [landingRoutes, itemRoutes, quizzRoutes, checkRoutes]
+
 
 import RequestOrder from "../pages/orderbook/RequestOrder";
 
