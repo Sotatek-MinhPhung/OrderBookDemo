@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-// import {landing, item, quizz, check} from "./index"
+import {requestOrder} from "./index";
 
 import Page404 from "../pages/error_page/Page404";
 
@@ -38,11 +38,8 @@ const childRoutes = (Layout, routes) =>
 const Routes = () => (
     <Router>
         <Switch>
-            {/*{childRoutes(BlankLayout, landing)}*/}
-            {/*{childRoutes(BlankLayout, item)}*/}
-            {/*{childRoutes(BlankLayout, quizz)}*/}
-            {/*{childRoutes(BlankLayout, check)}*/}
-                        <Route
+            {childRoutes(BlankLayout, requestOrder)}
+            <Route
                 render={() => (
                     <Page404 />
                 )}
