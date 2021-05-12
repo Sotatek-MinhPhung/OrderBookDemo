@@ -1,7 +1,14 @@
 import React from 'react'
+import store from "./store/store";
+import Provider from "react-redux/lib/components/Provider";
+import Routes from "./route/Routes";
 
 const App = () => (
     <>
+        <Provider store={store}>
+            <Routes/>
+            {/*toast*/}
+        </Provider>
     </>
 );
 

@@ -1,7 +1,7 @@
 import {combineReducers} from "redux";
 
-const rootReducer = combineReducers({
+const index = combineReducers({
     // todos: todoReducer
 })
 
-export default rootReducer
+export default index
