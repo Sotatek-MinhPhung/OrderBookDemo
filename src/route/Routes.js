@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import {requestOrder} from "./index";
+import {orderHistory, requestOrder} from "./index";
 
 import Page404 from "../pages/error_page/Page404";
 
@@ -39,6 +39,7 @@ const Routes = () => (
     <Router>
         <Switch>
             {childRoutes(BlankLayout, requestOrder)}
+            {childRoutes(BlankLayout, orderHistory)}
             <Route
                 render={() => (
                     <Page404 />

@@ -40,6 +40,7 @@
 
 
 import RequestOrder from "../pages/orderbook/RequestOrder";
+import OrderHistory from "../pages/orderbook/OrderHistory";
 
 // Request Order
 const requestOrderRoutes = {
@@ -48,4 +49,11 @@ const requestOrderRoutes = {
     children: null
 }
 
+const orderHistoryRoutes = {
+    path: "/order_history",
+    component: OrderHistory,
+    children: null
+}
+
 export const requestOrder = [requestOrderRoutes]
+export const orderHistory = [orderHistoryRoutes]

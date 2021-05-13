@@ -1,5 +1,5 @@
 import React from 'react';
-import TopNav from "../component/TopNav";
+import TopNav from "../components/TopNav";
 
 const BlankLayout = ({children}) => {
     return (
