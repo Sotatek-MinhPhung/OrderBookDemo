@@ -1,6 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
 
+
+/* Remove arrow button in input tag*/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+body {
+    background-color: #e7f4f8;
+}
+
 .my_nav {
     font-family:'Lato', sans-serif;
-    background: linear-gradient(to right, #b2fefa, #0ed2f7);
+    background: linear-gradient(to right, #bef6ff, #05bbe0);
+}
+
+.order_table {
+    max-width: 480px;
+    /*position: relative;*/
 }

@@ -7,11 +7,12 @@ import Page404 from "../pages/error_page/Page404";
 import BlankLayout from "../layouts/BlankLayout";
 
 const childRoutes = (Layout, routes) =>
-    routes.map(({ children, path, component: Component }) =>
+    routes.map(({ children, path, component: Component }, index) =>
         children ? (
             // Route item with children
-            children.map(({ path, component: Component }) => (
+            children.map(({ path, component: Component }, index) => (
                 <Route
+                    key={index}
                     path={path}
                     exact
                     render={props => (
@@ -24,6 +25,7 @@ const childRoutes = (Layout, routes) =>
         ) : (
             // Route item without children
             <Route
+                key={index}
                 path={path}
                 exact
                 render={props => (
