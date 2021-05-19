@@ -2,7 +2,7 @@ import axios from "axios"
 
 // TODO: set variable environment
 const axiosClient = axios.create({
-    baseUrl: `http://localhost:1234/api/v1`,
+    baseUrl: `http://10.2.40.240:3000`,
     timeout: 5000,
     responseType: 'json'
 })

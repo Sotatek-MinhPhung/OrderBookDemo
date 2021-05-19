@@ -1,41 +1,32 @@
 import React, {useEffect, useState} from "react"
 import {Button} from "reactstrap"
-import Web3 from "web3";
+import store from "../store/store";
+import connectAction from "../store/action/connectAction";
+import selectAccounts from "../store/selector/selectAccounts";
+import {generatePseudoRandomSalt} from "@0x/order-utils";
 
-// TODO: Using store to check connected
 const Connect = () => {
-    const [accounts, setAccounts] = useState([])
+    const [account, setAccount] = useState()
 
-    // store web3
     const connect = async () => {
-        if(window.ethereum) {
-            window.web3 = new Web3(window.ethereum)
-            await window.ethereum.enable()
-        } else if (window.web3) {
-            window.web3 = new Web3(window.web3.currentProvider)
-        } else {
-            window.alert("Non-Ethereum browser detected!")
-        }
-
-        checkConnected()
+        await store.dispatch(connectAction())
+        const accounts = await selectAccounts()
+        setAccount(accounts[0])
     }
 
-    // use store to check connected
-    const checkConnected = async () => {
-        if(window.web3.eth) {
-            setAccounts(await window.ethereum.request({ method: 'eth_requestAccounts' }))
-        }
+    const print = async () => {
+        console.log(await selectAccounts())
     }
 
     useEffect(() => {
-        checkConnected()
-    }, [])
+        connect()
+    })
 
     return (
         <>
             {
-                accounts[0] ?
-                    <p className="py-2 mb-0 fw-bold">{accounts[0]}</p> :
+                account ?
+                    <p className="py-2 mb-0 fw-bold">{account}</p> :
                     <Button onClick={connect}>Connect with MetaMask</Button>
             }
         </>

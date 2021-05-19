@@ -1,7 +1,8 @@
 import {combineReducers} from "redux";
+import connectReducer from "./connectReducer";
 
 const index = combineReducers({
-    // todos: todoReducer
+    connect: connectReducer
 })
 
 export default index
