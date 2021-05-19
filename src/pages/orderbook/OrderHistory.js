@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import DataTable from "react-data-table-component";
-
+import {Chart} from "../../components/Chart";
 const OrderHistory = () => {
     const [pageSize, setPageSize] = useState(5);
     const [error, setError] = useState(null);
@@ -101,6 +101,7 @@ const OrderHistory = () => {
                     pagination={true}
                     paginationRowsPerPageOptions={[2,5,10]}
                 />
+                <Chart />
             </div>
         )
     }
