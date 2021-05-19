@@ -20,9 +20,21 @@ const RequestOrder = () => {
         setPrice(event.target.value)
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         console.log(coin1 + " - " + amount + " - " + coin2 + " - " + price)
+        await approve()
+        await signOrder()
+    }
+
+    // TODO: Sign order
+    const signOrder = async () => {
+        console.log("signOrder")
+    }
+
+    // TODO: Approve
+    const approve = async () => {
+        console.log("approve")
     }
 
     return (
