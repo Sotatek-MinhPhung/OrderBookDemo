@@ -1,12 +1,11 @@
 import axios from "axios"
 
-// TODO: set variable environment
+// TODO: set environment variable
 const axiosClient = axios.create({
     baseURL: `http://10.2.40.240:3000`,
     timeout: 5000,
     responseType: "json"
 })
-
 
 axiosClient.interceptors.request.use(async (config) => {
     // Handle config

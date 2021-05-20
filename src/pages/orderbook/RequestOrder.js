@@ -2,53 +2,52 @@ import React, {useState} from 'react'
 import {Button, Form, FormGroup, Input, Label} from "reactstrap";
 import {signatureUtils, generatePseudoRandomSalt} from "@0x/order-utils";
 import {MetamaskSubprovider} from "@0x/subproviders";
-import zrxAbi from "../../abis/zrxAbi.json"
+import axios from "axios";
 import {sendOrderWithSignature} from "../../api/OrderApi";
+import { BigNumber } from "@0x/utils";
+import {Web3Wrapper} from "@0x/web3-wrapper";
 
-const zrxAddress = "0x5a1830Ebe15f422C1A9dFC04e2C7ad496cecA12a"
+const NULL_ADDRESS = "0x0000000000000000000000000000000000000000"
+const ZERO_VALUE = new BigNumber(0)
+const TEN_MINUTES_MS = 10*60*1000
+const ONE_SECOND_MS = 1000
+const DECIMALS = 18
 
-// TODO: remove all console.log
 const RequestOrder = () => {
-    const [coin1, setCoin1] = useState('')
+    const [token1, setToken1] = useState('')
     const [amount, setAmount] = useState(0)
-    const [coin2, setCoin2] = useState('')
+    const [token2, setToken2] = useState('')
     const [price, setPrice] = useState(0)
 
-    const handleCoin1Change = event => {
-        setCoin1(event.target.value)
+    const handleToken1Change = event => {
+        setToken1(event.target.value)
     }
     const handleAmountChange = event => {
         setAmount(event.target.value)
     }
-    const handleCoin2Change = event => {
-        setCoin2(event.target.value)
+    const handleToken2Change = event => {
+        setToken2(event.target.value)
     }
     const handlePriceChange = event => {
         setPrice(event.target.value)
     }
 
-    const signOrder = async () => {
-        const takerAddress = "0x041E7912541745A67F8c652a6bEe3CBAd131481d"
-
-        // TODO: replace fixed order with inserted value
+    const signOrder = async (config) => {
         const order = {
-            // api
-            chainId: 15,
-            // api
-            exchangeAddress: '0x198805e9682fceec29413059b68550f92868c129',
+            chainId: parseInt(config.chainId),
+            exchangeAddress: config.exchangeAddress,
             makerAddress: localStorage.currentAccount,
-            takerAddress: takerAddress,
-            feeRecipientAddress: '0x0000000000000000000000000000000000000000',
-            senderAddress: '0x0000000000000000000000000000000000000000',
-            makerAssetAmount: 1000000000000000000,
-            takerAssetAmount: 2000000000000000000,
-            makerFee: 0,
-            takerFee: 0,
-            expirationTimeSeconds: 1621227432,
-            // v
+            takerAddress: NULL_ADDRESS,
+            feeRecipientAddress: NULL_ADDRESS,
+            senderAddress: NULL_ADDRESS,
+            makerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(amount), DECIMALS),
+            takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(price), DECIMALS),
+            makerFee: ZERO_VALUE,
+            takerFee: ZERO_VALUE,
+            expirationTimeSeconds: new BigNumber(Date.now() + TEN_MINUTES_MS).div(ONE_SECOND_MS).integerValue(BigNumber.ROUND_CEIL),
             salt: generatePseudoRandomSalt(),
-            makerAssetData: '0xf47261b00000000000000000000000008ad3aa5d5ff084307d28c8f514d7a193b2bfe725',
-            takerAssetData: '0xf47261b00000000000000000000000008080c7e4b81ecf23aa6f877cfbfd9b0c228c6ffa',
+            makerAssetData: config.key1AssetData,
+            takerAssetData: config.key2AssetData,
             makerFeeAssetData: '0x',
             takerFeeAssetData: '0x'
         }
@@ -61,32 +60,33 @@ const RequestOrder = () => {
         )
     }
 
-    const approve = async () => {
-        console.log("approve")
-        let contract
-        const spender = "0xeCE39b520C0d8B5Baa74819a42b87778B77B6B1f"
+    const approve = async (config) => {
+        // ERC20 Proxy
+        const spender = "0x3880ef725db203c2ebebf432cdf3db2e243c479d"
 
         if (window.web3.eth) {
-            contract = new window.web3.eth.Contract(zrxAbi, zrxAddress)
-            // TODO: set value
-            console.log(await contract.methods.approve(spender, "100000000000")
-                .send({from: "0x041E7912541745A67F8c652a6bEe3CBAd131481d"}))
+            const contract = new window.web3.eth.Contract(config.key1ABI, config.key1Address)
+            console.log(await contract.methods.approve(spender, Web3Wrapper.toBaseUnitAmount(new BigNumber(amount), DECIMALS))
+                .send({from: localStorage.currentAccount}))
         } else {
-            // TODO: resolve this case
             console.log("Not connected")
         }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(coin1 + " - " + amount + " - " + coin2 + " - " + price)
-        await approve()
-        const orderWithSignature = await signOrder()
-        orderWithSignature.fromToken = coin1
-        orderWithSignature.toToken = coin2
-
-        //// with base axios
-        // console.log((await axios.post("http://10.2.40.240:3000/order", orderWithSignature)).data)
+        console.log(token1 + " - " + amount + " - " + token2 + " - " + price)
+        // get config value
+        const config = await axios.get(`http://192.168.1.208:5000/config?key1=${token1}&key2=${token2}`)
+        // log config data
+        console.log(config.data)
+        // approve
+        await approve(config.data)
+        // sign order and get order with signature
+        const orderWithSignature = await signOrder(config.data)
+        // Add 2 more value
+        orderWithSignature.fromToken = token1
+        orderWithSignature.toToken = token2
 
         // console.log(await sendOrderWithSignature(orderWithSignature))
         console.log(orderWithSignature)
@@ -100,12 +100,14 @@ const RequestOrder = () => {
                         <div className="d-flex flex-row justify-content-center">
                             <div>
                                 <FormGroup className="m-3">
-                                    <Label for="coin1">Coin 1: </Label>
-                                    <Input type="select" name="coin1" id="coin1" onChange={handleCoin1Change}>
-                                        <option value={null}>Chose Your Coin</option>
-                                        <option value="BTC">BTC</option>
-                                        <option value="ETH">ETH</option>
-                                        <option value="DOGE">DOGE</option>
+                                    <Label for="token1">Token 1: </Label>
+                                    <Input type="select" name="token1" id="token1" onChange={handleToken1Change}>
+                                        <option value={null}>Chose Your Token</option>
+                                        <option value="btc">BTC</option>
+                                        <option value="eth">ETH</option>
+                                        <option value="doge">DOGE</option>
+                                        <option value="zrx">ZRX</option>
+                                        <option value="hat">HAT</option>
                                     </Input>
                                 </FormGroup>
 
@@ -118,12 +120,14 @@ const RequestOrder = () => {
 
                             <div>
                                 <FormGroup className="m-3">
-                                    <Label htmlFor="coin2">Coin 2:</Label>
-                                    <Input type="select" name="coin2" id="coin2" onChange={handleCoin2Change}>
-                                        <option value={null}>Chose Your Coin</option>
-                                        <option value="BTC">BTC</option>
-                                        <option value="ETH">ETH</option>
-                                        <option value="DOGE">DOGE</option>
+                                    <Label htmlFor="token2">Token 2:</Label>
+                                    <Input type="select" name="token2" id="token2" onChange={handleToken2Change}>
+                                        <option value={null}>Chose Your Token</option>
+                                        <option value="btc">BTC</option>
+                                        <option value="eth">ETH</option>
+                                        <option value="doge">DOGE</option>
+                                        <option value="zrx">ZRX</option>
+                                        <option value="hat">HAT</option>
                                     </Input>
                                 </FormGroup>
 
