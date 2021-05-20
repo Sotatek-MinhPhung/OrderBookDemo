@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {Button, Form, FormGroup, Input, Label} from "reactstrap";
-import {signatureUtils} from "@0x/order-utils";
+import {signatureUtils, generatePseudoRandomSalt} from "@0x/order-utils";
 import {MetamaskSubprovider} from "@0x/subproviders";
 import zrxAbi from "../../abis/zrxAbi.json"
 import {sendOrderWithSignature} from "../../api/OrderApi";
@@ -32,9 +32,11 @@ const RequestOrder = () => {
 
         // TODO: replace fixed order with inserted value
         const order = {
+            // api
             chainId: 15,
+            // api
             exchangeAddress: '0x198805e9682fceec29413059b68550f92868c129',
-            makerAddress: '0x041E7912541745A67F8c652a6bEe3CBAd131481d',
+            makerAddress: localStorage.currentAccount,
             takerAddress: takerAddress,
             feeRecipientAddress: '0x0000000000000000000000000000000000000000',
             senderAddress: '0x0000000000000000000000000000000000000000',
@@ -43,7 +45,8 @@ const RequestOrder = () => {
             makerFee: 0,
             takerFee: 0,
             expirationTimeSeconds: 1621227432,
-            salt: 58607550732964590110595439505801883021839261307660472970772029207960142953111,
+            // v
+            salt: generatePseudoRandomSalt(),
             makerAssetData: '0xf47261b00000000000000000000000008ad3aa5d5ff084307d28c8f514d7a193b2bfe725',
             takerAssetData: '0xf47261b00000000000000000000000008080c7e4b81ecf23aa6f877cfbfd9b0c228c6ffa',
             makerFeeAssetData: '0x',
@@ -85,7 +88,8 @@ const RequestOrder = () => {
         //// with base axios
         // console.log((await axios.post("http://10.2.40.240:3000/order", orderWithSignature)).data)
 
-        console.log(await sendOrderWithSignature(orderWithSignature))
+        // console.log(await sendOrderWithSignature(orderWithSignature))
+        console.log(orderWithSignature)
     }
 
     return (

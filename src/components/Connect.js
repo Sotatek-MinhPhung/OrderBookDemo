@@ -27,6 +27,21 @@ const Connect = () => {
         }
     }
 
+    const handleAccountsChanged = () => {
+        window.ethereum.on('accountsChanged', (accounts) => {
+            setAccount(accounts[0])
+            localStorage.setItem("currentAccount", accounts[0])
+            setIsConnected(false)
+        })
+    }
+
+    const handleDisconnect = async () => {
+        await window.ethereum.on('disconnect', () => {
+            localStorage.removeItem("currentAccount")
+            setIsConnected(false)
+        })
+    }
+
     useEffect(() => {
         setAccount(localStorage.currentAccount)
 
@@ -37,12 +52,16 @@ const Connect = () => {
                 setIsConnected(true)
             }
         }
+
+        // account change event (can put anywhere)
+        handleAccountsChanged()
+        handleAccountsChanged()
     })
 
     return (
         <>
             {
-                account && isConnected?
+                (account && account !== "undefined" && isConnected )?
                     <p className="py-2 mb-0 fw-bold">{account}</p> :
                     <Button onClick={connect}>Connect with MetaMask</Button>
             }
