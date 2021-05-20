@@ -1,12 +1,11 @@
-import api from "./api";
+import axiosClient from "./api";
 
 const url = "/order"
 
-const sendOrderWithSignature = (orderWithSignature) => {
-    return api(url, orderWithSignature)
+export const sendOrderWithSignature = (orderWithSignature) => {
+    return axiosClient.post(url, orderWithSignature)
 }
 
 const OrderApi = {sendOrderWithSignature}
 
-// TODO: false
 export default OrderApi
