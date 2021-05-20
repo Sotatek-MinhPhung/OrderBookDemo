@@ -55,8 +55,7 @@ const RequestOrder = () => {
         return await signatureUtils.ecSignOrderAsync(
             new MetamaskSubprovider(window.web3.currentProvider),
             order,
-            // get from accounts
-            "0x041E7912541745A67F8c652a6bEe3CBAd131481d"
+            localStorage.currentAccount
         )
     }
 
