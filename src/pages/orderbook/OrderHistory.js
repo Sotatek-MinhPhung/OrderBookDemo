@@ -1,38 +1,39 @@
 import React, { useEffect, useState } from "react"
 import DataTable from "react-data-table-component";
-import {Chart} from "../../components/Chart";
+
+import Chart from "../../components/Chart";
 const OrderHistory = () => {
     const [pageSize, setPageSize] = useState(5);
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
 
-    useEffect(() => {
-        // fetch("http://10.2.14.46:3000/list-order")
-        fetch('http://localhost:3000/order/list', {
-            method: 'post',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                "pageSize": 20,
-                "pageNumber": 1,
-                "sortField": "id",
-                "sortDirection": "DESC"
-            }),
-            credentials: "same-origin"
-        })
-        .then(res => res.json())
-        .then(
-            (result) => {
-                setIsLoaded(true);
-                setItems(result.data.orderResponses);
-                console.log(">>>>>>>>>> result" + result.data.orderResponses);
-            },
-            (error) => {
-                setIsLoaded(true);
-                setError(error);
-            }
-        )
-    }, [items]);
+    // useEffect(() => {
+    //     // fetch("http://10.2.14.46:3000/list-order")
+    //     fetch('http://localhost:3000/order/list', {
+    //         method: 'post',
+    //         headers: {'Content-Type':'application/json'},
+    //         body: JSON.stringify({
+    //             "pageSize": 20,
+    //             "pageNumber": 1,
+    //             "sortField": "id",
+    //             "sortDirection": "DESC"
+    //         }),
+    //         credentials: "same-origin"
+    //     })
+    //     .then(res => res.json())
+    //     .then(
+    //         (result) => {
+    //             setIsLoaded(true);
+    //             setItems(result.data.orderResponses);
+    //             console.log(">>>>>>>>>> result" + result.data.orderResponses);
+    //         },
+    //         (error) => {
+    //             setIsLoaded(true);
+    //             setError(error);
+    //         }
+    //     )
+    // }, [items]);
 
     const columns = [
         {
@@ -87,24 +88,24 @@ const OrderHistory = () => {
             },
         },
     };
-    if (error) {
-        return <div>Error: {error.message}</div>
-    } else if (!isLoaded) {
-        return <div>Loading...</div>
-    } else {
+    // if (error) {
+    //     return <div>Error: {error.message}</div>
+    // } else if (!isLoaded) {
+    //     return <div>Loading...</div>
+    // } else {
         return (
             <div className="container">
-                <DataTable
+                {/* <DataTable
                     columns={columns}
                     data={items}
                     customStyles={customStyles}
                     pagination={true}
                     paginationRowsPerPageOptions={[2,5,10]}
-                />
+                /> */}
                 <Chart />
             </div>
         )
-    }
+    // }
 }
 
 export default OrderHistory

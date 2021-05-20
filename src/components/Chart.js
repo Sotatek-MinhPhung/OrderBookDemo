@@ -1,31 +1,17 @@
-import {widget} from "../tradingview/charting_library/charting_library.min";
-import {React} from "react";
-export class Chart extends React.Component {
-    static defaultProp = {
-        symbol: 'AAPL',
-		interval: 'D',
-		containerId: 'tv_chart_container',
-		datafeedUrl: 'https://demo_feed.tradingview.com',
-		libraryPath: '../tradingview/charting_library/',
-		chartsStorageUrl: 'https://saveload.tradingview.com',
-		chartsStorageApiVersion: '1.1',
-		clientId: 'tradingview.com',
-		userId: 'public_user_id',
-		fullscreen: false,
-		autosize: true,
-		studiesOverrides: {},
-    }
+import * as React from 'react';
+import {widget} from '../charting_library/charting_library.min';
 
-    getLanguageFromURL() {
-        const regex = new RegExp('[\\?&]lang=([^&#]*)');
-        const results = regex.exec(window.location.search);
-        return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    }
+function getLanguageFromURL() {
+	const regex = new RegExp('[\\?&]lang=([^&#]*)');
+	const results = regex.exec(window.location.search);
+	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
 
-    tvWidget = null;
+class Chart extends React.Component {
+	tvWidget = null;
 
-    componentDidMount() {
-        const widgetOptions = {
+	componentDidMount() {
+		const widgetOptions = {
 			symbol: this.props.symbol,
 			// BEWARE: no trailing slash is expected in feed URL
 			datafeed: new window.Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
@@ -43,12 +29,13 @@ export class Chart extends React.Component {
 			fullscreen: this.props.fullscreen,
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
+			theme: this.props.theme
 		};
 
-        const tvWidget = new widget(widgetOptions);
+		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
 
-        tvWidget.onChartReady(() => {
+		tvWidget.onChartReady(() => {
 			tvWidget.headerReady().then(() => {
 				const button = tvWidget.createButton();
 				button.setAttribute('title', 'Click to show a notification popup');
@@ -64,7 +51,14 @@ export class Chart extends React.Component {
 				button.innerHTML = 'Check API';
 			});
 		});
-    }
+	}
+
+	componentWillUnmount() {
+		if (this.tvWidget !== null) {
+			this.tvWidget.remove();
+			this.tvWidget = null;
+		}
+	}
 
     render() {
         return(
@@ -72,3 +66,21 @@ export class Chart extends React.Component {
         )
     }
 }
+
+Chart.defaultProps = {
+	symbol: 'AAPL',
+	interval: '1',
+	containerId: 'tv_chart_container',
+	datafeedUrl: 'https://demo_feed.tradingview.com',
+	libraryPath: '../charting_library/',
+	chartsStorageUrl: 'https://saveload.tradingview.com',
+	chartsStorageApiVersion: '1.1',
+	clientId: 'tradingview.com',
+	userId: 'public_user_id',
+	fullscreen: true,
+	height: 80,
+	autosize: true,
+	studiesOverrides: {},
+	theme: "dark"
+}
+export default Chart;
