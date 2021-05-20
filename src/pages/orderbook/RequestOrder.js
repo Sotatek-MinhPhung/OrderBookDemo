@@ -15,21 +15,21 @@ const DECIMALS = 18
 
 const RequestOrder = () => {
     const [token1, setToken1] = useState('')
-    const [amount, setAmount] = useState(0)
+    const [amountToken1, setAmountToken1] = useState(0)
     const [token2, setToken2] = useState('')
-    const [price, setPrice] = useState(0)
+    const [amountToken2, setAmountToken2] = useState(0)
 
     const handleToken1Change = event => {
         setToken1(event.target.value)
     }
-    const handleAmountChange = event => {
-        setAmount(event.target.value)
+    const handleAmountToken1Change = event => {
+        setAmountToken1(event.target.value)
     }
     const handleToken2Change = event => {
         setToken2(event.target.value)
     }
-    const handlePriceChange = event => {
-        setPrice(event.target.value)
+    const handleAmountToken2Change = event => {
+        setAmountToken2(event.target.value)
     }
 
     const signOrder = async (config) => {
@@ -40,8 +40,8 @@ const RequestOrder = () => {
             takerAddress: NULL_ADDRESS,
             feeRecipientAddress: NULL_ADDRESS,
             senderAddress: NULL_ADDRESS,
-            makerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(amount), DECIMALS),
-            takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(price), DECIMALS),
+            makerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(amountToken1), DECIMALS),
+            takerAssetAmount: Web3Wrapper.toBaseUnitAmount(new BigNumber(amountToken2), DECIMALS),
             makerFee: ZERO_VALUE,
             takerFee: ZERO_VALUE,
             expirationTimeSeconds: new BigNumber(Date.now() + TEN_MINUTES_MS).div(ONE_SECOND_MS).integerValue(BigNumber.ROUND_CEIL),
@@ -65,7 +65,7 @@ const RequestOrder = () => {
 
         if (window.web3.eth) {
             const contract = new window.web3.eth.Contract(config.key1ABI, config.key1Address)
-            console.log(await contract.methods.approve(spender, Web3Wrapper.toBaseUnitAmount(new BigNumber(amount), DECIMALS))
+            console.log(await contract.methods.approve(spender, Web3Wrapper.toBaseUnitAmount(new BigNumber(amountToken1), DECIMALS))
                 .send({from: localStorage.currentAccount}))
         } else {
             console.log("Not connected")
@@ -74,7 +74,7 @@ const RequestOrder = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(token1 + " - " + amount + " - " + token2 + " - " + price)
+        console.log(token1 + " - " + amountToken1 + " - " + token2 + " - " + amountToken2)
         // get config value
         const config = await axios.get(`http://192.168.1.208:5000/config?key1=${token1}&key2=${token2}`)
         // log config data
@@ -83,7 +83,7 @@ const RequestOrder = () => {
         await approve(config.data)
         // sign order and get order with signature
         const orderWithSignature = await signOrder(config.data)
-        // Add 2 more value
+        // Add 2 more values
         orderWithSignature.fromToken = token1
         orderWithSignature.toToken = token2
 
@@ -111,9 +111,9 @@ const RequestOrder = () => {
                                 </FormGroup>
 
                                 <FormGroup className="m-3">
-                                    <Label for="number">Amount: </Label>
-                                    <Input type="number" name="amount" id="amount" placeholder="Amount"
-                                           onChange={handleAmountChange}/>
+                                    <Label for="number">Amount Token 1: </Label>
+                                    <Input type="number" name="amountToken1" id="amountToken1" placeholder="Amount"
+                                           onChange={handleAmountToken1Change}/>
                                 </FormGroup>
                             </div>
 
@@ -131,9 +131,9 @@ const RequestOrder = () => {
                                 </FormGroup>
 
                                 <FormGroup className="m-3">
-                                    <Label htmlFor="amount">Price: </Label>
-                                    <Input type="number" name="price" id="price" placeholder="Price"
-                                           onChange={handlePriceChange}/>
+                                    <Label htmlFor="amountToken2">Amount Token 2: </Label>
+                                    <Input type="number" name="amountToken2" id="amountToken2" placeholder="Amount"
+                                           onChange={handleAmountToken2Change}/>
                                 </FormGroup>
                             </div>
                         </div>
