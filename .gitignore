@@ -30,3 +30,4 @@ package-lock.json
 public/manifest.json
 .vscode/
 src/react-app-env.d.ts
+package-lock.json
