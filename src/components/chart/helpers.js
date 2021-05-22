@@ -1,13 +1,21 @@
 // Make requests to CryptoCompare API
-export async function makeApiRequest(path, bodyData) {
+export async function makeApiRequest(path, urlParameters, flag) {
 	try {
-		const response = await fetch(`https://min-api.cryptocompare.com/${path}`,{
-			method: 'post',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(bodyData)
-		});
+		let response;
+		if(flag) {
+			response = await fetch(`https://min-api.cryptocompare.com/${path}`,{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(urlParameters)
+			});
+		} else {
+			const query = Object.keys(urlParameters)
+			.map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
+			.join('&');
+			response = await fetch(`https://min-api.cryptocompare.com${path}?${query}`);
+		}
 		return response.json();
 	} catch (error) {
 		throw new Error(`CryptoCompare request error: ${error.status}`);

@@ -1,21 +1,23 @@
 import { parseFullSymbol } from './helpers.js';
+import {w3cwebsocket as W3CWebsocket} from 'websocket';
 
-const socket = io('wss://streamer.cryptocompare.com');
+const API_KEY = "950a085e08786ec71ee621f82cea8981b8f134a47f9cc43fbcfb4cc232fbe953";
+const socket = new W3CWebsocket('wss://streamer.cryptocompare.com/v2?api_key=' + API_KEY);
 const channelToSubscription = new Map();
 
-socket.on('connect', () => {
+socket.onopen = () => {
 	console.log('[socket] Connected');
-});
+};
 
-socket.on('disconnect', (reason) => {
+socket.onclose = (reason) => {
 	console.log('[socket] Disconnected:', reason);
-});
+};
 
-socket.on('error', (error) => {
+socket.onerror =(error) => {
 	console.log('[socket] Error:', error);
-});
+};
 
-socket.on('m', data => {
+socket.onmessage = (data) => {
 	console.log('[socket] Message:', data);
 	const [
 		eventTypeStr,
@@ -27,7 +29,7 @@ socket.on('m', data => {
 		tradeTimeStr,
 		,
 		tradePriceStr,
-	] = data.split('~');
+	] = data.data.split('~');
 
 	if (parseInt(eventTypeStr) !== 0) {
 		// skip all non-TRADE events
@@ -66,7 +68,7 @@ socket.on('m', data => {
 
 	// send data to every subscriber of that symbol
 	subscriptionItem.handlers.forEach(handler => handler.callback(bar));
-});
+};
 
 function getNextDailyBarTime(barTime) {
 	const date = new Date(barTime * 1000);
@@ -74,7 +76,7 @@ function getNextDailyBarTime(barTime) {
 	return date.getTime() / 1000;
 }
 
-export function subscribeOnStream(
+export function subscribeBars(
 	symbolInfo,
 	resolution,
 	onRealtimeCallback,
