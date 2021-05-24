@@ -57,17 +57,16 @@ class Chart extends React.Component {
 }
 
 Chart.defaultProps = {
-	symbol:'Coinbase:BTC/USD',
+	symbol:'BTC/USDT',
 	interval: '1',
 	containerId: 'tv_chart_container',
-	datafeedUrl: 'https://demo_feed.tradingview.com',
+	datafeedUrl: 'https://api.binance.com/api',
 	libraryPath: '../../charting_library/',
-	chartsStorageUrl: 'https://saveload.tradingview.com',
+	// chartsStorageUrl: 'https://saveload.tradingview.com',
 	chartsStorageApiVersion: '1.1',
 	clientId: 'tradingview.com',
 	userId: 'public_user_id',
 	fullscreen: true,
-	height: 80,
 	autosize: true,
 	studiesOverrides: {},
 	theme: "dark"
