@@ -2,14 +2,9 @@ import { w3cwebsocket as W3CWebsocket } from 'websocket';
 import {
 	generateSymbol, makeApiRequest
 } from './helpers.js';
+const BASE_SOCKET = "wss://stream.binance.com:9443/ws/";
 
-const socket = new W3CWebsocket('wss://stream.binance.com:9443/ws/btcusdt@kline_15m');
-// const socket = new W3CWebsocket();
-socket.onopen = () => {
-	console.log('[socket] Connected');
-};
-
-const channelToSubscrip = new Map();
+const channelToSubscription = new Map();
 
 const lastBarsCache = new Map();
 
@@ -27,6 +22,29 @@ const configurationData = {
         {name: "Index", value: "index"}
     ],
     supported_resolutions: [ "1", "3", "5", "15", "30", "60", "1D", "2D", "3D", "1W", "3W", "1M", '6M' ]
+}
+function convertResolution(resolution) {
+	let interval = {
+		'1': '1m',
+		'3': '3m',
+		'5': '5m',
+		'15': '15m',
+		'30': '30m',
+		'60': '1h',
+		'120': '2h',
+		'240': '4h',
+		'360': '6h',
+		'480': '8h',
+		'720': '12h',
+		'D': '1d',
+		'1D': '1d',
+		'3D': '3d',
+		'W': '1w',
+		'1W': '1w',
+		'M': '1M',
+		'1M': '1M',
+	}[resolution];
+	return interval;
 }
 
 async function getAllSymbols() {
@@ -94,32 +112,13 @@ export default {
 
 	getBars: async (symbolInfo, resolution, from, to, onHistoryCallback, onErrorCallback, firstDataRequest) => {
 		console.log('[getBars]: Method call', symbolInfo, resolution, from, to);
-		const interval = {
-            '1': '1m',
-            '3': '3m',
-            '5': '5m',
-            '15': '15m',
-            '30': '30m',
-            '60': '1h',
-            '120': '2h',
-            '240': '4h',
-            '360': '6h',
-            '480': '8h',
-            '720': '12h',
-            'D': '1d',
-            '1D': '1d',
-            '3D': '3d',
-            'W': '1w',
-            '1W': '1w',
-            'M': '1M',
-            '1M': '1M',
-        }[resolution];
+		const interval = convertResolution(resolution);
 		const urlParameters = {
 			symbol: symbolInfo.exchange,
 			interval: interval,
 			startTime: from*1000,
-			endTime: to*1000,
-			limit: 2000,
+			endTime: Date.now(),
+			limit: 1000,
 		};
 		const query = Object.keys(urlParameters)
 			.map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
@@ -137,7 +136,7 @@ export default {
 			let bars = [];
 			data.forEach(bar => {
 				var time = bar[0]/1000;
-				if (time >= from && time < to) {
+				if (time >= from && time <= to) {
 					bars = [...bars, {
 						time: bar[0],
 						close: parseFloat(bar[4]),
@@ -170,7 +169,14 @@ export default {
 		onResetCacheNeededCallback,
 	) => {
 		console.log('[subscribeBars]: Method call with subscribeUID:', subscribeUID);
-	
+		const interval = convertResolution(resolution);
+		if (channelToSubscription.has(subscribeUID)) {
+			console.log("[subscribeBars]: Check subscribeUID")
+		}
+		const socket = new W3CWebsocket(`${BASE_SOCKET}${symbolInfo.exchange.toLowerCase()}@kline_${interval}`);
+		socket.onopen = () => {
+			console.log('[socket] Connected');
+		}
 		socket.onmessage = (data) => {
 			let message = JSON.parse(data.data);
 			let candlestick = message.k;
@@ -189,3 +195,4 @@ export default {
 		// unsubscribeFromStream(subscriberUID);
 	},
 };
+
