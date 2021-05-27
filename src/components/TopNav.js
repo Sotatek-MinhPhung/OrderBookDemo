@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 import {Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from "reactstrap";
-import Connect from "./Connect";
+import Login from "./Login";
 
 const TopNav = () => {
     const [collapsed, setCollapsed] = useState(false)
@@ -24,8 +24,8 @@ const TopNav = () => {
                 </Nav>
 
                 <Nav navbar>
-                    <NavItem className="mx-4">
-                        <Connect/>
+                    <NavItem active={false} className="mx-4">
+                        <Login/>
                     </NavItem>
                 </Nav>
             </Collapse>

@@ -21,3 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+package-lock.json
+package-lock.json
+manifest.json
+robots.txt
+package-lock.json
+public/manifest.json
+.vscode/
+src/react-app-env.d.ts
+package-lock.json
