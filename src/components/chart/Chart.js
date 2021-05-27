@@ -1,27 +1,27 @@
 import * as React from 'react';
-import {widget} from '../../charting_library/charting_library.min';
+import { widget } from '../../charting_library/charting_library.min';
 import Datafeed from './datafeed';
+
 
 function getLanguageFromURL() {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
 	const results = regex.exec(window.location.search);
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
-
 class Chart extends React.Component {
-	tvWidget = null;
+	constructor(props) {super()}
 
-	componentDidMount() {
+	tvWidget = null;
+	componentDidUpdate() {
 		const widgetOptions = {
 			symbol: this.props.symbol,
-			// BEWARE: no trailing slash is expected in feed URL
 			datafeed: Datafeed,
 			interval: this.props.interval,
 			container_id: this.props.containerId,
 			library_path: this.props.libraryPath,
 
 			locale: getLanguageFromURL() || 'en',
-			disabled_features: ['use_localstorage_for_settings'],
+			disabled_features: ['use_localstorage_for_settings', 'header_symbol_search'],
 			enabled_features: ['study_templates'],
 			charts_storage_url: this.props.chartsStorageUrl,
 			charts_storage_api_version: this.props.chartsStorageApiVersion,
@@ -30,7 +30,7 @@ class Chart extends React.Component {
 			fullscreen: this.props.fullscreen,
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
-			theme: this.props.theme
+			theme: this.props.theme,
 		};
 
 		const tvWidget = new widget(widgetOptions);
@@ -41,7 +41,6 @@ class Chart extends React.Component {
 			
 		});
 	}
-
 	componentWillUnmount() {
 		if (this.tvWidget !== null) {
 			this.tvWidget.remove();
@@ -51,7 +50,7 @@ class Chart extends React.Component {
 
     render() {
         return(
-            <div id={ this.props.containerId } className={ 'Chart' }></div>
+			<div id={ this.props.containerId } className={ 'Chart' }></div>
         )
     }
 }
@@ -69,6 +68,6 @@ Chart.defaultProps = {
 	fullscreen: true,
 	autosize: true,
 	studiesOverrides: {},
-	theme: "dark"
+	theme: "light"
 }
 export default Chart;

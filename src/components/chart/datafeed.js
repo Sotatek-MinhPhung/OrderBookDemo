@@ -47,7 +47,7 @@ function convertResolution(resolution) {
 	return interval;
 }
 
-async function getAllSymbols() {
+export async function getAllSymbols() {
 	const data = await makeApiRequest('v3/exchangeInfo');
 	let allSymbols = [];
 
@@ -113,13 +113,21 @@ export default {
 	getBars: async (symbolInfo, resolution, from, to, onHistoryCallback, onErrorCallback, firstDataRequest) => {
 		console.log('[getBars]: Method call', symbolInfo, resolution, from, to);
 		const interval = convertResolution(resolution);
-		const urlParameters = {
-			symbol: symbolInfo.exchange,
-			interval: interval,
-			startTime: from*1000,
-			endTime: Date.now(),
-			limit: 1000,
-		};
+		let urlParameters = {}
+		if (to*1000 >= Date.now()) {
+			urlParameters = {
+				symbol: symbolInfo.exchange,
+				interval: interval
+			}
+		} else {
+			urlParameters = {
+				symbol: symbolInfo.exchange,
+				interval: interval,
+				startTime: from*1000,
+				endTime: to*1000,
+				limit: 1000,
+			}
+		}
 		const query = Object.keys(urlParameters)
 			.map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
 			.join('&');
@@ -180,6 +188,8 @@ export default {
 		socket.onmessage = (data) => {
 			let message = JSON.parse(data.data);
 			let candlestick = message.k;
+			console.log(message)
+			console.log(candlestick)
 			onRealtimeCallback({
 					time: message.E,
 					open: parseFloat(candlestick.o),
@@ -193,6 +203,6 @@ export default {
 	unsubscribeBars: (subscriberUID) => {
 		console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
 		// unsubscribeFromStream(subscriberUID);
-	},
-};
+	}
+}
 
