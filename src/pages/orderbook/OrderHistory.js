@@ -1,57 +1,47 @@
-import React from "react";
+import { InputLabel, TextField } from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
+import { useEffect, useState } from "react";
 import Chart from "../../components/chart/Chart";
+import { getAllSymbols } from '../../components/chart/datafeed';
 import './OrderHistory.css';
-import {getAllSymbols} from '../../components/chart/datafeed';
-import {Select, Button, InputLabel, MenuItem, TextField} from '@material-ui/core';
 
-class OrderHistory extends React.Component {
-    
-	constructor(props) {
-		super();
-		this.state = {
-			symData: [],
-			propSymbol: "BTC/USDT"
-		}
-	}
+const OrderHistory = () => {
+    const [symData, setSymData] = useState([]);
+    const [propSymbol, setPropSymbol] = useState("BTC/USDT");
 
-    async getSymbol() {
-        this.setState({
-			symData: await getAllSymbols()
-		})
+    const initSym = async () => {
+        const symbols = await getAllSymbols()
+        setSymData(symbols)
     }
 
-    componentDidMount() {
-        this.getSymbol();
-    }
+    useEffect(() => {
+        if (symData.length == 0) {
+            initSym();
+        }
+    })
 
-    handleOnChange(event) {
-		this.setState({
-			propSymbol: event.target.value
-		})
-        console.log(this.state.propSymbol);
+    const handleOnChange = (event) => {
+        setPropSymbol(event.target.innerText)
 	}
-    render() {
-        return (
-            <div className="container">
-                    <div className="row toolbar">
-                        <div className="col-4">
-                            <InputLabel id="label">Symbol:</InputLabel>
-                            <Select name="symbol" id="symbol" defaultValue="" onChange={(event) => this.handleOnChange(event)}>
-                                {this.state.symData.map((item, i) => {
-                                    return (<MenuItem value={item.full_name}>{item.full_name}</MenuItem>)
-                                })}
-                            </Select>
-                        </div>
-                        <div className="col-4">
-                            <Select />
-                        </div>
-                        <div className="col-4">
-                            <Button />
-                        </div>
+    return (
+        <div className="container">
+                <div className="row toolbar">
+                    <div className="col-4">
+                        <Autocomplete
+                            id="symbolAutoComplete"
+                            options={symData}
+                            getOptionLabel={(option) => option.full_name}
+                            renderInput={(params) => <TextField {...params} label="Symbol:" variant="outlined" />}
+                            onChange={(event) => handleOnChange(event)}
+                        />
                     </div>
-                <Chart theme="light" containerId="tv_chart_container" symbol={this.state.propSymbol}/>
-            </div>
-        )
-    }
+                    <div className="col-4">
+                    </div>
+                    <div className="col-4">
+                    </div>
+                </div>
+            <Chart theme="light" containerId="tv_chart_container" symbol={propSymbol}/>
+        </div>
+    )
 }
 export default OrderHistory;

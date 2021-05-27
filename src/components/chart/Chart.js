@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useState, useEffect} from 'react';
 import { widget } from '../../charting_library/charting_library.min';
 import Datafeed from './datafeed';
 
@@ -8,51 +8,40 @@ function getLanguageFromURL() {
 	const results = regex.exec(window.location.search);
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
-class Chart extends React.Component {
-	constructor(props) {super()}
+const Chart = (props) => {
 
-	tvWidget = null;
-	componentDidUpdate() {
+	useEffect(() => {
 		const widgetOptions = {
-			symbol: this.props.symbol,
+			symbol: props.symbol,
 			datafeed: Datafeed,
-			interval: this.props.interval,
-			container_id: this.props.containerId,
-			library_path: this.props.libraryPath,
+			interval: props.interval,
+			container_id: props.containerId,
+			library_path: props.libraryPath,
 
 			locale: getLanguageFromURL() || 'en',
 			disabled_features: ['use_localstorage_for_settings', 'header_symbol_search'],
 			enabled_features: ['study_templates'],
-			charts_storage_url: this.props.chartsStorageUrl,
-			charts_storage_api_version: this.props.chartsStorageApiVersion,
-			client_id: this.props.clientId,
-			user_id: this.props.userId,
-			fullscreen: this.props.fullscreen,
-			autosize: this.props.autosize,
-			studies_overrides: this.props.studiesOverrides,
-			theme: this.props.theme,
+			charts_storage_url: props.chartsStorageUrl,
+			charts_storage_api_version: props.chartsStorageApiVersion,
+			client_id: props.clientId,
+			user_id: props.userId,
+			fullscreen: props.fullscreen,
+			autosize: props.autosize,
+			studies_overrides: props.studiesOverrides,
+			theme: props.theme,
 		};
 
 		const tvWidget = new widget(widgetOptions);
-		this.tvWidget = tvWidget;
-
-		tvWidget.onChartReady(() => {
-			console.log('Chart has loaded!')
-			
-		});
-	}
-	componentWillUnmount() {
-		if (this.tvWidget !== null) {
-			this.tvWidget.remove();
-			this.tvWidget = null;
+		return () => {
+			tvWidget.onChartReady(() => {
+				console.log('Chart has loaded!')
+				
+			});
 		}
-	}
-
-    render() {
-        return(
-			<div id={ this.props.containerId } className={ 'Chart' }></div>
-        )
-    }
+	}, [props])
+	return(
+		<div id={ props.containerId } className={ 'Chart' }></div>
+	)
 }
 
 Chart.defaultProps = {
@@ -61,7 +50,6 @@ Chart.defaultProps = {
 	containerId: 'tv_chart_container',
 	datafeedUrl: 'https://api.binance.com/api',
 	libraryPath: '../../charting_library/',
-	// chartsStorageUrl: 'https://saveload.tradingview.com',
 	chartsStorageApiVersion: '1.1',
 	clientId: 'tradingview.com',
 	userId: 'public_user_id',
